@@ -1,4 +1,4 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+<p align="center"><a href="https://laravel.com" target="_blank"><img src="box2.png" width="150"></a></p>
 
 <p align="center">
 <a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
@@ -7,56 +7,104 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## About Laravel
+## 箱子聊天室
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+箱子聊天室旨在为解决无法上外网的用户，提供一个简单的网页链接来与指定人进行私有会话聊天。来保障聊天过程不受监管、审查的安全通信服务。
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+当然你也可以将其用于其他业务方面，比如网页客服帮助，用户售后系统等等。
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- 匿名会话聊天
+- 支持 PC / 移动端设备
+- 支持配置多种渠道访客
+- 支持访客消息通过 Telegram 进行通知和回复
+- 支持访客消息通过 Email 通知 
+- 支持 Line 消息通知
+- 限制大陆常见内嵌非安全浏览器运行（详见后文 大陆非安全浏览器UA）
 
-## Learning Laravel
+箱子聊天室是完全开源，你可以自行修改其任何环节的功能，来更适配符合自己需求。
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## 运作流程
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+箱子聊天室提供基础的网页版一对一私密聊天会话功能，你安装完成后，你可以将你生成的 URL 分享到一些社交软件中的个人信息页面。需要联系你的人将点击链接与你进行实时会话，如果你不在线。箱子聊天室还会通过EMAIL、Telegram等方式通知到你，你也可以在 Telegram 内部直接进行回复消息，整个过程安全加密可匿，访客无需提供任何个人隐私信息，原则上只要访客设备不被监听窃取是非常安全的，所有的数据都将通过你自己设立的加密方式、自己的秘钥加密并传输到自己的服务器。
 
-## Laravel Sponsors
+## 为什么会有箱子聊天室？
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+近年来，大陆很多典型代表社交软件覆盖（渗透）到生活的方方面面，比如医疗、社保、日用支付、兴趣圈子，出行记录，政务系统以及所关联着很多附属生活产品，它涉及到太多的个人隐私了。它不再试是单单一个仅有聊天功能的社交软件了，它甚至能掌握你的一切。
 
-### Premium Partners
+屡增不减的个人隐私泄露事件，频频发生的监管案例，让人必须重视这件事。
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/)**
-- **[OP.GG](https://op.gg)**
+希望各位能明白：**隐私之所以会泄露，是因为自己提供了，如果没有提供则不会泄露**。
 
-## Contributing
+### 企业能否保护用户隐私
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+任何商业行为都只有利益目的，没有无私奉献。他能保护你只是因为它暂且能从你这里获得收益，一旦界限明确，原本你所依赖的都会反之变为威胁。
 
-## Code of Conduct
+隐私行为分为主动泄露和被动泄露，前者是由于企业间的合作，政务间的合作，会导致你的数据会流传到第三方，而这个过程是你不需要知晓的（被奉为企业机密）。而后者的被动泄露也就是常见到的因系统漏洞原因导致用户数据泄露、或者企业内鬼将某些参与到的数据打包出售在黑市，经过几手之后你的信息可能就以几分钱的价钱或者免费发布到互联网，被很多人下载得到。
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+参见： 
 
-## Security Vulnerabilities
+- 微博5亿手机号数据泄露
+- QQ8亿用户手机号关联数据泄露
+- 7亿人口数据泄露
+- 顺丰快递数据泄露
+- 京东13G数据泄露
+- 平安保险10万用户数据泄露
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+对于一个普通用户：**你很难做到提交出去的隐私数据不被泄露，而能做的就是尽量避免提供**。
+
+对于已经提交出去的信息，你可以选择不必担心，因为数据不可能退还给你，并且企业不会因为你个人将你的数据抹除。
+
+### **注销账号**
+
+在大陆注销账号，是一个非常奇葩的做法。
+
+选择注销用户的目的原本是为了减少因为泄露，删去留在企业的个人用户数据，在大陆就变成了更深度实名的一个过程。你需要提供手持身份证正反、人脸校验、户口本、或者银行卡等方式校验并等待人工审核通过，无论结果如何，你都将更多的信息提供给了企业，可能原本你只是个白号。
+
+参见：
+
+- [也真是活久见，之前听说有人注销账号被索要户口本觉得已经很过分了，来看看国美注销的要求吧](https://s.v2ex.com/t/736873)
+- [现在注销个账户还要再上传个证件？](https://www.v2ex.com/t/693072)
+- [网易的账号终于可以快速注销了](https://v2ex.com/t/660437)
+
+### 言论审查
+
+这是一个非常涉及政治的话题，简单说一下，分为两种情况。
+
+为了维护社会稳定，企业需要在公安机关进行备案，企业需要自行设立机制来检测处理一些“违规”用户，根据情况记录上报。
+
+为了能保证公安机关顺利开展案件，你在社交软件的所有数据，都可以直接被调取，而且非常容易不需要申请手续。其实这点在一些社交软件用户协议中也有说明，因涉及到群众安全和国家安全等事由时，不必通知用户，相关机构可直接提取用户信息。
+
+### Telegram
+
+到目前为止，Telegram 都依然是非常重视保护个人隐私方面作为第一使命的社交软件。至于未来会不会变得和其他商业软件一样不得而知，至少此时还是一片净土，你依然可以呼吸自由的空气。
+
+但社交是根据圈子决定的，并不是简单一个人能够将你所有联系人转移到另外一个社交体系中，你只能转移你自己，保护你自己。
+
+所以这里提供的建议是：
+
+减少实名制软件的使用频率，遇隐私话题必要话题可通过箱子聊天室进行沟通。所有产生的数据都由你自己保管，你有权利随时选择删除。
+
+
+
+### 安全至关重要
+
+我们还提供了其他相关的安全方面的隐私项目.
+
+- **[匿名化短链接 ](https://x007.in/)**
+- 远程销毁数据
+
+## 安装
+
+箱子聊天室是通过 PHP 语言编写而成的开源程序，你可以很轻松地将其部署在服务器上，甚至是虚拟主机里面。
+
+## 大陆浏览器
+
+| 浏览器 | UA   |
+| ------ | ---- |
+|        |      |
+|        |      |
+|        |      |
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+这个项目开源可用，允许修改和再次发布，请保留版权及分享给更多的人。
