@@ -1,0 +1,68 @@
+html,body{height: 100%}
+.lite-chatbox .cleft .content{display: block !important;}
+/* .lite-chatbox .content img{width: auto !important;} */
+[style*="--aspect-ratio"] > :first-child { width: 100%; } [style*="--aspect-ratio"] > img { height: auto; } @supports (--custom:property) { [style*="--aspect-ratio"] { position: relative; } [style*="--aspect-ratio"]::before { content: ""; display: block; padding-bottom: calc(100% / (var(--aspect-ratio))); } [style*="--aspect-ratio"] > :first-child { position: absolute; top: 0; left: 0; height: 100%; } }
+
+
+.message-sending{position: absolute;left: 0px;margin-left: -20px;}
+
+.room-header{
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 99;
+    left: 0px;
+    padding: 0px;
+}
+
+.input-container{
+    position: fixed;
+    /*position: sticky;*/
+    bottom: 0px;
+    left: 0px;
+    width: 100%;
+    padding: 0px;
+}
+
+.composer_rich_textarea{
+    width: 100%;
+    height: auto;
+    max-height: 200px;
+    background-color: #fff;
+    overflow-y: scroll;
+}
+
+.fill-profile::before{
+    content: ''; position: absolute; top: 0; right: 0; bottom: 0; left: 0; filter: blur(20px); margin: -30px;
+    background: url("/img/1.jpg") 0 / cover fixed;
+}
+.fill-profile{padding-top:5em}
+
+.flex-photos{
+    list-style:none;padding:0px;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.flex-photos {
+    display: flex;
+    flex-wrap: wrap;
+}
+.flex-photos::after {
+    content: '';
+    flex-grow: 999999999;
+}
+.flex-photos >div {
+    margin: 2px;
+    background-color: violet;
+    position: relative;
+}
+.flex-photos >div>i{
+    display: block;
+}
+.flex-photos >div>img {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    vertical-align: bottom;
+}

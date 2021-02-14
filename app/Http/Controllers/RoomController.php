@@ -1,0 +1,144 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Longman\TelegramBot\Telegram;
+
+class RoomController extends Controller
+{
+    public function showGuestRoom(Request $request)
+    {
+        return view('room');
+    }
+
+    public function getMessages(Request $request)
+    {
+        $uuid = $request->input('uuid');
+        $last_id = $request->input('last_id');
+        $user = DB::table('users')->where('uuid', $uuid)->first();
+        if (!$user) {
+            return ee_json('用户不存在', 500);
+        }
+        $build = DB::table('messages')->where(function ($build) use ($user) {
+            $build->where('from_user_id', $user->id)->orWhere('to_user_id', $user->id);
+        });
+        if ($last_id) {
+            $build->where('id', '>', $last_id);
+        }
+        $messages = $build->get();
+        $messages->each(function ($message) {
+            if ($message->sticker_path) {
+                $message->sticker_path = Storage::url($message->sticker_path);
+            }
+            if ($message->media && preg_match('#^/?public#', $message->media)) {
+                $message->media = Storage::url($message->media);
+            }
+            if ($message->message_text === null) {
+                $message->message_text = '';
+            }
+        });
+        $last_id = $messages->last() ? $messages->last()->id : 0;
+        return ee_json('消息列表', 200, ['messages' => $messages, 'last_id' => $last_id]);
+    }
+
+    public function sendMessage(Request $request, Telegram $telegram)
+    {
+        $text = $request->input('text', '');
+        $media = $request->input('media', '');
+        $uuid = $request->input('uuid', '');
+        $request_id = $request->input('request_id', '');
+        $reply_id = $request->input('reply_id', 0);
+
+        $chat_id = env('TELEGRAM_RECEIVE_ID');
+        $user = DB::table('users')->where('uuid', $uuid)->first();
+        if (!$user) {
+            return ee_json('用户不存在', 500);
+        }
+
+        $extentData = [];
+
+        if ($media) {
+            $photo = $media;
+            if(!preg_match('#^https?\://#is', $photo)){
+                $photo = preg_replace('#^/?storage/#','', $photo);
+                $storagePath = storage_path('app/public/'.$photo);
+                $photo = \Longman\TelegramBot\Request::encodeFile($storagePath);
+            }
+            $result = \Longman\TelegramBot\Request::sendPhoto([
+                'chat_id'             => $chat_id,
+                'photo'               => $photo,
+                'caption'             => $text,
+                'reply_to_message_id' => $reply_id
+            ]);
+
+            if($result->isOk() && $photoResult = $result->getResult()->getPhoto()){
+                $extentData = [
+                    'media'        => $media,
+                    'media_type'   => 1,
+                    'media_width'  => $photoResult[0]->getWidth(),
+                    'media_height' => $photoResult[0]->getHeight(),
+                ];
+            }
+        } else {
+            $result = \Longman\TelegramBot\Request::sendMessage([
+                'chat_id'             => $chat_id,
+                'text'                => $text,
+                'reply_to_message_id' => $reply_id
+            ]);
+        }
+
+        if ($result->isOk()) {
+            $res = DB::table('messages')->insert(array_merge([
+                'from_name'    => $user->name,
+                'message_text' => $text,
+                'message_id'   => $result->getResult()->message_id,
+                'chat_id'      => $chat_id,
+                'from_id'      => 0,
+                'reply_id'     => $reply_id,
+                'from_user_id' => $user->id,
+                'request_id'   => $request_id,
+                'created_at'   => time(),
+                'updated_at'   => time()
+            ],$extentData));
+            $insertId = DB::getPdo()->lastInsertId();
+            return ee_json('发送成功', 200, ['local' => $res, 'id' => $insertId,'result' => $result]);
+        }
+        return ee_json('发送失败', 500, $result->printError());
+    }
+
+    public function setUserName(Request $request)
+    {
+        $name = $request->input('name', '');
+        $remark = $request->input('remark', '');
+
+        $uuid = uuid();
+        $res = DB::table('users')->insert([
+            'name'       => $name,
+            'remark'     => $remark,
+            'uuid'       => $uuid,
+            'created_at' => time(),
+            'updated_at' => time(),
+        ]);
+        if ($res) {
+            return ee_json('ok', 200, ['uuid' => $uuid]);
+        }
+        return ee_json('设置用户失败', 500);
+    }
+
+
+    public function uploadImage(Request $request)
+    {
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $name = sprintf("%s.%s", $file->getBasename(), $file->extension());
+            $storagePath = md5($name) . $file->extension();
+            $file->storeAs('/public/upload/', $storagePath);
+            $url = Storage::url('upload/' . $storagePath);
+            return ee_json('ok', 200, ['url' => $url]);
+        }
+        return ee_json('未上传图片', 500);
+    }
+}
