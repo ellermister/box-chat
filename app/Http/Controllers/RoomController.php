@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -9,9 +10,26 @@ use Longman\TelegramBot\Telegram;
 
 class RoomController extends Controller
 {
+    /**
+     * 展示聊天室页面
+     *
+     * @param Request $request
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     */
     public function showGuestRoom(Request $request)
     {
-        return view('room');
+        $settings = Setting::getAll(['room_name', 'room_desc', 'room_avatar','site_keyword','site_description']);
+        return view('room',['settings' => $settings]);
+    }
+
+    /**
+     * 获取聊天室信息
+     * @param Request $request
+     */
+    public function getRoomProfile(Request $request)
+    {
+        $list = Setting::getAll(['room_name', 'room_desc', 'room_avatar']);
+        return ee_json('profile', 200, $list);
     }
 
     public function getMessages(Request $request)
@@ -62,9 +80,9 @@ class RoomController extends Controller
 
         if ($media) {
             $photo = $media;
-            if(!preg_match('#^https?\://#is', $photo)){
-                $photo = preg_replace('#^/?storage/#','', $photo);
-                $storagePath = storage_path('app/public/'.$photo);
+            if (!preg_match('#^https?\://#is', $photo)) {
+                $photo = preg_replace('#^/?storage/#', '', $photo);
+                $storagePath = storage_path('app/public/' . $photo);
                 $photo = \Longman\TelegramBot\Request::encodeFile($storagePath);
             }
             $result = \Longman\TelegramBot\Request::sendPhoto([
@@ -74,7 +92,7 @@ class RoomController extends Controller
                 'reply_to_message_id' => $reply_id
             ]);
 
-            if($result->isOk() && $photoResult = $result->getResult()->getPhoto()){
+            if ($result->isOk() && $photoResult = $result->getResult()->getPhoto()) {
                 $extentData = [
                     'media'        => $media,
                     'media_type'   => 1,
@@ -102,9 +120,9 @@ class RoomController extends Controller
                 'request_id'   => $request_id,
                 'created_at'   => time(),
                 'updated_at'   => time()
-            ],$extentData));
+            ], $extentData));
             $insertId = DB::getPdo()->lastInsertId();
-            return ee_json('发送成功', 200, ['local' => $res, 'id' => $insertId,'result' => $result]);
+            return ee_json('发送成功', 200, ['local' => $res, 'id' => $insertId, 'result' => $result]);
         }
         return ee_json('发送失败', 500, $result->printError());
     }

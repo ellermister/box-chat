@@ -19,6 +19,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 
+Route::get('/room/profile', [\App\Http\Controllers\RoomController::class, 'getRoomProfile']);
+
 // 聊天室访客相关接口
 // >> 获取用户ID
 // >> 发送消息
