@@ -17,7 +17,7 @@
     </script>
 </head>
 <body style="background-color: beige;">
-<div class="container h-100" style="overflow-y: scroll;">
+<div class="container h-100" style="overflow-y: hidden;">
     <div class="room-header">
         <div class="container" style="padding:0px">
             <div class="row" >
