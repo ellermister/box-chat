@@ -144,7 +144,7 @@ function send_message(text)
         get_user:get_user,
     });
     $('#rom').append(html);
-    $('.room-body').scrollTop($('.lite-chatbox').height())
+    $('.room-content').scrollTop($('.lite-chatbox').height())
     $('.composer_rich_textarea ').html('')
 
     message_request_ids.push(_msg_id);
@@ -195,7 +195,7 @@ function send_message_with_photo(text,media)
         get_user:get_user,
     });
     $('#rom').append(html);
-    $('.room-body').scrollTop($('.lite-chatbox').height())
+    $('.room-content').scrollTop($('.lite-chatbox').height())
     $('.composer_rich_textarea ').html('')
 
     message_request_ids.push(_msg_id);
@@ -247,11 +247,11 @@ function get_messages()
         $('#rom').append(html);
         // if (is_first) {
         //     is_first = false;
-        //     $('.room-body').scrollTop($('.lite-chatbox').height())
+        //     $('.room-content').scrollTop($('.lite-chatbox').height())
         //     // $('.lite-chatbox').scrollTop($('.lite-chatbox').height()+$('.lite-chatbox').offset().top);
         // }
-        // $('.room-body').scrollTop($('.lite-chatbox').height())
-        $('.room-body').scrollTop($('.room-body')[0].scrollHeight)
+        // $('.room-content').scrollTop($('.lite-chatbox').height())
+        $('.room-content').scrollTop($('.room-content')[0].scrollHeight)
 
         // 这里需要过滤，否则会出现一个元素动态绑定两次的情况
         filter_element('.message-media-video').appear();
@@ -292,7 +292,7 @@ function pull_message()
         }
 
         let scrollUpdate = false;
-        if($('.lite-chatbox').height()-($('.room-body').scrollTop()+$('.room-body').height()) < 10){
+        if($('.lite-chatbox').height()-($('.room-content').scrollTop()+$('.room-content').height()) < 10){
             scrollUpdate = true
         }
         let html = template('tpl-message', {
@@ -304,7 +304,7 @@ function pull_message()
         $('#rom').append(html);
         pull_message_lock = false;
         if(scrollUpdate){
-            $('.room-body').scrollTop($('.lite-chatbox').height())
+            $('.room-content').scrollTop($('.lite-chatbox').height())
         }
 
         filter_element('.message-media-video').appear();
@@ -343,7 +343,7 @@ $(document.body).on('disappear', '.message-media-video', function(e, $affected) 
     $(e.currentTarget).find('video')[0].currentTime = 0
     // console.log($(e.currentTarget).find('video')[0],'停止')
 });
-$('.room-body').scroll(function(){
+$('.room-content').scroll(function(){
     $.force_appear();
 })
 
