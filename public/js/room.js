@@ -1379,33 +1379,33 @@ function renderEditorPhotos(photos)
         }))
     }
 }
-renderEditorPhotos([
-    {
-        img:'/img/1.jpg',
-        width:1280,
-        height:720
-    },
-    {
-        img:'/img/2.jpg',
-        width:957,
-        height:1280
-    },
-    {
-        img:'/img/3.jpg',
-        width:1067,
-        height:1280
-    },
-    {
-        img:'/img/4.jpg',
-        width:814,
-        height:1280
-    },
-    {
-        img:'/img/5.jpg',
-        width:1280,
-        height:1061
-    },
-])
+// renderEditorPhotos([
+//     {
+//         img:'/img/1.jpg',
+//         width:1280,
+//         height:720
+//     },
+//     {
+//         img:'/img/2.jpg',
+//         width:957,
+//         height:1280
+//     },
+//     {
+//         img:'/img/3.jpg',
+//         width:1067,
+//         height:1280
+//     },
+//     {
+//         img:'/img/4.jpg',
+//         width:814,
+//         height:1280
+//     },
+//     {
+//         img:'/img/5.jpg',
+//         width:1280,
+//         height:1061
+//     },
+// ])
 
 // renderEditorPhotos([
 //
