@@ -6,6 +6,8 @@ use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Longman\TelegramBot\Entities\InputMedia\InputMedia;
+use Longman\TelegramBot\Entities\InputMedia\InputMediaPhoto;
 use Longman\TelegramBot\Telegram;
 
 class RoomController extends Controller
@@ -62,6 +64,14 @@ class RoomController extends Controller
         return ee_json('消息列表', 200, ['messages' => $messages, 'last_id' => $last_id]);
     }
 
+    /**
+     * 发送消息
+     *
+     * @param Request $request
+     * @param Telegram $telegram
+     * @return array
+     * @throws \Longman\TelegramBot\Exception\TelegramException
+     */
     public function sendMessage(Request $request, Telegram $telegram)
     {
         $text = $request->input('text', '');
@@ -79,27 +89,86 @@ class RoomController extends Controller
         $extentData = [];
 
         if ($media) {
-            $photo = $media;
-            if (!preg_match('#^https?\://#is', $photo)) {
-                $photo = preg_replace('#^/?storage/#', '', $photo);
-                $storagePath = storage_path('app/public/' . $photo);
-                $photo = \Longman\TelegramBot\Request::encodeFile($storagePath);
+            $media_list = [];
+            if(is_string($media)){
+                $media_list[] = $media;
+            }elseif(is_array($media)){
+                $media_list = array_column($media,'url');
             }
-            $result = \Longman\TelegramBot\Request::sendPhoto([
-                'chat_id'             => $chat_id,
-                'photo'               => $photo,
-                'caption'             => $text,
-                'reply_to_message_id' => $reply_id
-            ]);
+            if(count($media_list) > 1){
+                $inputMediaPhoto = [];
+                foreach ($media_list as $item){
+                    $photo = $item;
+                    if (!preg_match('#^https?\://#is', $photo)) {
+                        $photo = preg_replace('#^/?storage/#', '', $photo);
+                        $storagePath = storage_path('app/public/' . $photo);
+                        $photo = \Longman\TelegramBot\Request::encodeFile($storagePath);
+                    }
 
-            if ($result->isOk() && $photoResult = $result->getResult()->getPhoto()) {
-                $extentData = [
-                    'media'        => $media,
-                    'media_type'   => 1,
-                    'media_width'  => $photoResult[0]->getWidth(),
-                    'media_height' => $photoResult[0]->getHeight(),
-                ];
+                    $inputMediaPhoto[] = new InputMediaPhoto([
+                        'type'    => 'photo',
+                        'media'   => $photo,
+                        'caption' => strval($text),
+                    ]);
+                }
+
+                $result = \Longman\TelegramBot\Request::sendMediaGroup([
+                    'chat_id' => $chat_id,
+                    'media'   => $inputMediaPhoto
+                ]);
+
+                if ($result->isOk() && $messagesResult = $result->getResult()) {
+                    $groupData = [];
+                    foreach($messagesResult as $index => $message){
+                        $baseData = [
+                            'from_name'      => $user->name,
+                            'message_text'   => $text,
+                            'message_id'     => $message->message_id,
+                            'media_group_id' => $message->media_group_id,
+                            'chat_id'        => $chat_id,
+                            'from_id'        => 0,
+                            'reply_id'       => $reply_id,
+                            'from_user_id'   => $user->id,
+                            'request_id'     => $request_id,
+                            'created_at'     => time(),
+                            'updated_at'     => time()
+                        ];
+                        $mediaItem = $message->getPhoto();
+                        $groupData[] = array_merge($baseData,[
+                            'media'        => $media_list[$index],
+                            'media_type'   => 1,
+                            'media_width'  => end($mediaItem)->getWidth(),
+                            'media_height' => end($mediaItem)->getHeight()
+                        ]);
+                    }
+                    $res = DB::table('messages')->insert($groupData);
+                    return ee_json('发送成功', 200, ['local' => $res, 'result' => $result]);
+                }
+                return ee_json('发送失败', 500, ['result' => $result]);
+            }else{
+                $photo = $media;
+                if (!preg_match('#^https?\://#is', $photo)) {
+                    $photo = preg_replace('#^/?storage/#', '', $photo);
+                    $storagePath = storage_path('app/public/' . $photo);
+                    $photo = \Longman\TelegramBot\Request::encodeFile($storagePath);
+                }
+                $result = \Longman\TelegramBot\Request::sendPhoto([
+                    'chat_id'             => $chat_id,
+                    'photo'               => $photo,
+                    'caption'             => $text,
+                    'reply_to_message_id' => $reply_id
+                ]);
+
+                if ($result->isOk() && $photoResult = $result->getResult()->getPhoto()) {
+                    $extentData = [
+                        'media'        => $media,
+                        'media_type'   => 1,
+                        'media_width'  => $photoResult[0]->getWidth(),
+                        'media_height' => $photoResult[0]->getHeight(),
+                    ];
+                }
             }
+
         } else {
             $result = \Longman\TelegramBot\Request::sendMessage([
                 'chat_id'             => $chat_id,

@@ -72,6 +72,7 @@ class GenericmessageCommand extends SystemCommand
         $media_width = 0;
         $media_height = 0;
         $media = '';
+        $media_group_id = 0;
 
         $message_text = $message->getText();
         $stickerPath = '';
@@ -116,16 +117,18 @@ class GenericmessageCommand extends SystemCommand
                 $media_width = $lastPhotoFile->getWidth();
                 $media_height = $lastPhotoFile->getHeight();
             }
+            $media_group_id = $message->getMediaGroupId();
         }
 
         \Illuminate\Support\Facades\DB::table('messages')->insert([
-            'from_name'    => $message->getChat()->getFirstName() . $message->getChat()->getLastName(),
-            'message_text' => $message_text,
-            'sticker_path' => $stickerPath,
-            'media'        => $media,
-            'media_type'   => $media_type,
-            'media_width'  => $media_width,
-            'media_height' => $media_height,
+            'from_name'      => $message->getChat()->getFirstName() . $message->getChat()->getLastName(),
+            'message_text'   => $message_text,
+            'sticker_path'   => $stickerPath,
+            'media'          => $media,
+            'media_type'     => $media_type,
+            'media_width'    => $media_width,
+            'media_height'   => $media_height,
+            'media_group_id' => intval($media_group_id),
             'message_id'   => $message->getMessageId(),
             'chat_id'      => $message->getChat()->getId(),
             'from_id'      => $message->getFrom()->getId(),

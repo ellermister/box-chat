@@ -45,7 +45,7 @@
     <div class="room-body" style="position:fixed;top: 42px;bottom: 64px;left: 0px;width: 100%;" dstyle="margin-top: 42px;margin-bottom: 64px;">
         <div class="room-content container h-100" style="padding:0px;overflow-y: scroll;">
             <div class="lite-chatbox" id="rom">
-                
+
 {{--            @include("layouts/test-chat")--}}
 
             </div>
@@ -112,7 +112,15 @@
                 </div>
                 <div class="modal-body">
                     <figure class="figure" style="margin-bottom: 0px;">
-                        <img src="/img/1.jpg" class="figure-img img-fluid rounded"  id="upload-photo-preview-img">
+                        <div style="overflow-y: auto;max-height: 500px;">
+                            <div class="preview-flex-photos">
+{{--                                <div class="photos-box"><img src="/img/1.jpg" class="figure-img img-fluid rounded"  id="upload-photo-preview-img"></div>--}}
+{{--                                <div class="photos-box"><img src="/img/2.jpg" class="figure-img img-fluid rounded"  id="upload-photo-preview-img"></div>--}}
+{{--                                <div class="photos-box"><img src="/img/3.jpg" class="figure-img img-fluid rounded"  id="upload-photo-preview-img"></div>--}}
+{{--                                <div class="photos-box"><img src="/img/4.jpg" class="figure-img img-fluid rounded"  id="upload-photo-preview-img"></div>--}}
+{{--                                <div class="photos-box"><img src="/img/5.jpg" class="figure-img img-fluid rounded"  id="upload-photo-preview-img"></div>--}}
+                            </div>
+                        </div>
                         <figcaption class="figure-caption">
                             <div class="progress ">
                                 <div class="progress-bar progress-bar-striped progress-bar-animated" id="upload-photo-preview-progress" role="progressbar" style="width: 0%;" >0%</div>
@@ -189,8 +197,193 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
         crossorigin="anonymous"></script>
 <script src="https://unpkg.com/art-template@4.13.2/lib/template-web.js" charset="utf-8"></script>
-<script src="/js/room.js" charset="utf-8"></script>
 @verbatim
+<script id="tpl-photos" type="text/html">
+    {{if photos.length > 1}}
+    <div class="preview-flex-photos" style="width:{{show_width}}px">
+        {{each photos}}
+        <div class="photos-box" style="width:{{position[$index].width}}px;height:{{position[$index].height * 320}}px"><img src="{{$value.img}}" class="figure-img img-fluid"></div>
+        {{/each}}
+    </div>
+    {{else}}
+    <div class="preview-flex-photos">
+        {{each photos}}
+        <div class="photos-box" ><img src="{{$value.img}}" class="figure-img img-fluid"></div>
+        {{/each}}
+    </div>
+    {{/if}}
+</script>
+<script id="tpl-message-group-photo"  type="text/html">
+    <span class="content" style="display:inline-block !important; ">
+          <div class="message-group-photos" style="width:{{$data.show_width}}px;">
+             {{each $data.album message index}}
+                <div class="message-group-box" style="width: {{$data.position[index].width}}px;height: {{$data.position[index].height * $data.show_width}}px">
+                      <img src="{{message.media}}" />
+                </div>
+             {{/each}}
+             <div class="clearfix"></div>
+         </div>
+    {{@ $data.message_text}}
+        {{ if $data.id == 0 }}
+             <div class="message-sending spinner-border spinner-border-sm text-danger" role="status" id="_msg_id_{{$data._msg_id}}">
+                <span class="sr-only">Loading...</span>
+              </div>
+        {{/if}}
+    </span>
+</script>
+<script id="tpl-message2" type="text/html">
+    {{each list}}
+
+    {{ if $value.to_user_id != 0 }}
+    <div class="cleft cmsg">
+        <img class="headIcon radius" ondragstart="return false;" oncontextmenu="return false;" src="{{ setting('room_avatar', '/avatar/default.jpg') }}">
+        <span class="name">{{$value.from_name}}</span>
+        {{if $value.media_type == 1}}
+        {{if $value.album}}
+             <% include( 'tpl-message-group-photo', $value) %>
+        {{else}}
+        <span class="content"  style="max-width: {{$value.media_width}}px;">
+
+								{{if mobile_check()}}
+								<div style="--aspect-ratio:{{$value.media_width}}/{{$value.media_height}};">
+								  <img src="{{$value.media}}" />
+								</div>
+								{{else}}
+								<div style="--aspect-ratio:{{$value.media_width}}/{{$value.media_height}};">
+								  <img src="{{$value.media}}" />
+								</div>
+								{{/if}}
+
+            {{@ $value.message_text}}
+						</span>
+        {{/if}}
+
+        {{else if $value.media_type == 2}}
+        <span class="content"  style="max-width: {{$value.video_width}}px;">
+							<div  style="--aspect-ratio:{{$value.video_width}}/{{$value.video_height}};" >
+								<video width="{{$value.video_width}}" height="{{$value.video_height}}" controls="" autoplay="" muted="" loop="">
+								  <source src="{{$value.media}}" type="video/mp4">
+								</video>
+							</div>
+
+
+						{{@ $value.message_text}}
+						</span>
+        {{else if $value.media_type == 3}}
+        <span class="content"  style="max-width: {{$value.media_width}}px;">
+
+								{{if mobile_check()}}
+								<div style="--aspect-ratio:{{$value.media_width}}/{{$value.media_height}};">
+								  <img src="{{$value.media}}" />
+								</div>
+								{{else}}
+								<div style="--aspect-ratio:{{$value.media_width}}/{{$value.media_height}};">
+								  <img src="{{$value.media}}" />
+								</div>
+								{{/if}}
+
+            {{@ $value.message_text}}
+						</span>
+
+        {{else if $value.media_type == 4}}
+        <span class="content message-media-video"  style="max-width: {{$value.media_width}}px;">
+                <div  style="--aspect-ratio:{{$value.media_width}}/{{$value.media_height}};" >
+                    <video width="{{$value.media_width}}" height="{{$value.media_height}}" controls="" autoplay="" muted="" loop="">
+                      <source src="{{$value.media}}" type="video/mp4">
+                    </video>
+                </div>
+            {{@ $value.message_text}}
+            </span>
+        {{else}}
+        <span class="content" style="max-width: max-content;">
+                {{@ $value.message_text}}
+            </span>
+        {{/if}}
+    </div>
+
+    {{ else if $value.from_user_id != 0 }}
+    <div class="cright cmsg">
+        <img class="headIcon radius" ondragstart="return false;" oncontextmenu="return false;" src="{{ get_user('avatar', '/avatar/default.jpg') }}">
+        <span class="name">{{$value.from_name}}</span>
+        {{if $value.media_type == 1}}
+        {{if $value.album}}
+        <% include( 'tpl-message-group-photo', $value) %>
+        {{else}}
+            <span class="content"  style="max-width: {{$value.media_width}}px;">
+
+                {{if mobile_check()}}
+                <div style="--aspect-ratio:{{$value.media_width}}/{{$value.media_height}};">
+                  <img src="{{$value.media}}" />
+                </div>
+                {{else}}
+                <div style="--aspect-ratio:{{$value.media_width}}/{{$value.media_height}};">
+                  <img src="{{$value.media}}" />
+                </div>
+                <!-- <img class="unload-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 {{$value.media_width}} {{$value.media_height}}'%3E%3C/svg%3E" data-src="https://weixin.sb{{$value.media}}" style="width: {{$value.media_width}}px;height: {{$value.media_height}}px;" onload="imgOnLoad(this)"><br> -->
+                {{/if}}
+
+                {{@ $value.message_text}}
+                {{ if $value.id == 0 }}
+                    <div class="message-sending spinner-border spinner-border-sm text-danger" role="status" id="_msg_id_{{$value._msg_id}}">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                {{/if}}
+            </span>
+        {{/if}}
+
+        {{else if $value.media_type == 2}}
+        <span class="content"  style="max-width: {{$value.video_width}}px;">
+							<div  style="--aspect-ratio:{{$value.video_width}}/{{$value.video_height}};" >
+								<video width="{{$value.video_width}}" height="{{$value.video_height}}" controls="" autoplay="" muted="" loop="">
+								  <source src="{{$value.media}}" type="video/mp4">
+								</video>
+							</div>
+
+
+						{{@ $value.message_text}}
+            {{ if $value.id == 0 }}
+             <div class="message-sending spinner-border spinner-border-sm text-danger" role="status" id="_msg_id_{{$value._msg_id}}">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            {{/if}}
+						</span>
+        {{else if $value.media_type == 3}}
+             <span class="content"  style="max-width: {{$value.media_width}}px;">
+
+                                    {{if mobile_check()}}
+                                    <div style="--aspect-ratio:{{$value.media_width}}/{{$value.media_height}};">
+                                      <img src="{{$value.media}}" />
+                                    </div>
+                                    {{else}}
+                                    <div style="--aspect-ratio:{{$value.media_width}}/{{$value.media_height}};">
+                                      <img src="{{$value.media}}" />
+                                    </div>
+                <!-- <img class="unload-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 {{$value.media_width}} {{$value.media_height}}'%3E%3C/svg%3E" data-src="https://weixin.sb{{$value.media}}" style="width: {{$value.media_width}}px;height: {{$value.media_height}}px;" onload="imgOnLoad(this)"><br> -->
+                                    {{/if}}
+
+            {{@ $value.message_text}}
+            {{ if $value.id == 0 }}
+                    <div class="message-sending spinner-border spinner-border-sm text-danger" role="status" id="_msg_id_{{$value._msg_id}}">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                {{/if}}
+                </span>
+        {{else}}
+        <span class="content" style="max-width: max-content;">
+						{{@ $value.message_text}}
+            {{ if $value.id == 0 }}
+            <div class="message-sending spinner-border spinner-border-sm text-danger" role="status" id="_msg_id_{{$value._msg_id}}">
+                <span class="sr-only">Loading...</span>
+            </div>
+        {{/if}}
+        </span>
+
+        {{/if}}
+    </div>
+    {{/if}}
+    {{/each}}
+</script>
+
 <script id="tpl-message" type="text/html">
     {{each list}}
 
@@ -297,6 +490,23 @@
                 </div>
             {{/if}}
 						</span>
+        {{else if $value.media_type == 3}}
+             <span class="content">
+                 <div class="message-group-photos" style="width:{{$value.media.show_width}}px;">
+                 {{each $value.media.photos photo photo_index}}
+                    <div class="message-group-box" style="width: {{$value.media.position[photo_index].width}}px;height: {{$value.media.position[photo_index].height * 380}}px">
+                          <img src="{{photo.img}}" />
+                    </div>
+                 {{/each}}
+                 <div class="clearfix"></div>
+                 </div>
+                {{@ $value.message_text}}
+                {{ if $value.id == 0 }}
+                     <div class="message-sending spinner-border spinner-border-sm text-danger" role="status" id="_msg_id_{{$value._msg_id}}">
+                        <span class="sr-only">Loading...</span>
+                      </div>
+                {{/if}}
+            </span>
         {{else}}
         <span class="content" style="max-width: max-content;">
 						{{@ $value.message_text}}
@@ -313,5 +523,6 @@
     {{/each}}
 </script>
 @endverbatim
+<script src="/js/room.js" charset="utf-8"></script>
 </body>
 </html>
